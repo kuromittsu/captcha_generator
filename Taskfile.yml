@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  BUILD_DIR: ./build/
+  FONT_DIR: ./build/fonts/
+
+tasks:
+  build:
+    aliases: [b]
+    cmds:
+      - go build -o "{{.BUILD_DIR}}captcha_generator.exe" ./cmd/captcha_generator/
+
+  test_base64:
+    aliases: [base64]
+    cmds:
+      - task: b
+      - "{{.BUILD_DIR}}captcha_generator.exe --val=foobar --w=150 --h=60 --out=base64 --fontpath={{.FONT_DIR}}MouldyCheeseRegular.ttf"
+
+  test_png:
+    aliases: [png]
+    cmds:
+      - task: b
+      - "{{.BUILD_DIR}}captcha_generator.exe --val=foobar --w=150 --h=60 --out=png --fontpath={{.FONT_DIR}}MouldyCheeseRegular.ttf"
+
+  clean_cache:
+    aliases: [cc]
+    cmds:
+      - go clean -cache
