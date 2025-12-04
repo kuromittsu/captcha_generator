@@ -4,13 +4,13 @@
 
 ### Flags
 
-| name     | flag         | type   | default  | desc.                         |
-| -------- | ------------ | ------ | -------- | ----------------------------- |
-| val      | `--val`      | string | 0        | value / text captcha          |
-| w        | `--w`        | int    | 0        | render width                  |
-| h        | `--h`        | int    | 0        | render height                 |
-| out      | `--out`      | string | `base64` | output type `base64` or `png` |
-| fontpath | `--fontpath` | string | ""       | path to font `ttf`            |
+| name     | flag         | type   | default  | description            |
+| -------- | ------------ | ------ | -------- | ---------------------- |
+| val      | `--val`      | string | 0        | value / text captcha   |
+| w        | `--w`        | int    | 0        | render width           |
+| h        | `--h`        | int    | 0        | render height          |
+| out      | `--out`      | string | `base64` | `base64 \| png \| jpg` |
+| fontpath | `--fontpath` | string | ""       | path to font `ttf`     |
 
 ### Output to Base64
 
@@ -19,6 +19,8 @@
 | name | flag    | type   | value    |
 | ---- | ------- | ------ | -------- |
 | out  | `--out` | string | `base64` |
+
+> base64 result from JPG format, before from PNG format
 
 see more [flags](#flags)
 
@@ -31,7 +33,7 @@ captcha_generator.exe --val=foobar --out=base64
 will output like this
 
 <pre style="white-space: pre-wrap; word-wrap: break-word;">
-iVBORw0KGgoAAAANSUhEUgAAAJYAAAA8CAIAAAAL5NQ9AAAdlUlEQVR4nOR9WWxk15neWe5a99ZeRRZ3skn2ql7UUmu1WrE948gay5sMLxMZCWYQ+CVAkAV5CJAA8zDZHgZBECDIQ4I8eOzYUbzFtsay3RqP7JZsqd0re+W+FKtYrPXu954lqCqyuHSxSLYot2x9Igjx1q1T557v/P///f85p1p47c1Pg4PD6mLNd+l7bwdj2D0SO4ge/eEDHWxzxNuRv2z0sWz0LEVi/...
+/9j/2wCEAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSgBBwcHCggKEwoKEygaFhooKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKP/AABEIADwAlgMBIgACEQEDEQH/...
 </pre>
 
 you can preview using [Base64 viewer](https://base64-viewer.onrender.com/)
@@ -63,6 +65,32 @@ successfully generate : captcha_foobar.png
 or preview like this
 
 ![math_captcha_2_3.png](./docs/images/captcha_foobar.png)
+
+### Output to JPG
+
+#### JPG flag
+
+| name | flag    | type   | value |
+| ---- | ------- | ------ | ----- |
+| out  | `--out` | string | `jpg` |
+
+see more [flags](#flags)
+
+#### Example
+
+```shell
+captcha_generator.exe --val=foobar --out=jpg
+```
+
+will output like this
+
+```txt
+successfully generate : captcha_foobar.jpg
+```
+
+or preview like this
+
+![math_captcha_2_3.png](./docs/images/captcha_foobar.jpg)
 
 ## Task
 
@@ -116,6 +144,22 @@ task test_png
 
 check [Taskfile.yml](Taskfile.yml)
 
+### Run output JPG
+
+Run executable `captcha_generator.exe` in folder `build`
+
+```shell
+task jpg
+```
+
+or
+
+```shell
+task test_jpg
+```
+
+check [Taskfile.yml](Taskfile.yml)
+
 ## Build from source
 
 ```
@@ -124,5 +168,7 @@ go build -o ./build/captcha_generator.exe ./cmd/math/
 
 ## Todo
 
+- [x] Split individual values and apply rotation on each part
+- [x] Add output to JPG
 - [ ] Make magic numbers more customizable
-- [ ] Add more outputs (JPG, ...)
+- [ ] Add more outputs ...
