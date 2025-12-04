@@ -24,6 +24,12 @@ tasks:
       - task: b
       - "{{.BUILD_DIR}}captcha_generator.exe --val=foobar --w=150 --h=60 --out=png --fontpath={{.FONT_DIR}}MouldyCheeseRegular.ttf"
 
+  test_jpg:
+    aliases: [jpg]
+    cmds:
+      - task: b
+      - "{{.BUILD_DIR}}captcha_generator.exe --val=foobar --w=150 --h=60 --out=jpg --fontpath={{.FONT_DIR}}MouldyCheeseRegular.ttf"
+
   clean_cache:
     aliases: [cc]
     cmds:
