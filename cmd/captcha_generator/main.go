@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
 	"flag"
 	"fmt"
-	"image/png"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/fogleman/gg"
@@ -57,26 +53,8 @@ func main() {
 		dc.SetRGB(1.0, 1.0, 1.0) // dark background → light text
 	}
 
-	// write text
-	if fontPath == "" {
-		scale := float64(height) / 20
-		dc.Scale(scale, scale)
-		dc.DrawStringAnchored(val,
-			(float64(width)/2)/scale,
-			(float64(height)/2)/scale,
-			0.5, 0.5,
-		)
-		dc.Identity()
-	} else {
-		// scale := float64(height) / 20
-		// dc.Scale(scale, scale)
-		dc.DrawStringAnchored(val,
-			float64(width)/2,
-			float64(height)/2,
-			0.5, 0.5,
-		)
-		dc.Identity()
-	}
+	// draw text
+	drawCharsWithRotation(dc, val, rng)
 
 	// circle noise
 	noiseCircle(dc, rng, 10) // before 40
@@ -91,6 +69,10 @@ func main() {
 
 	case "png":
 		output := outputPng(dc, fmt.Sprintf("captcha_%s.png", val))
+		fmt.Printf("successfully generate : %s", output)
+
+	case "jpg":
+		output := outputJpg(dc, fmt.Sprintf("captcha_%s.jpg", val))
 		fmt.Printf("successfully generate : %s", output)
 
 	default:
@@ -114,49 +96,25 @@ func setBackgound(dc *gg.Context, rng *rand.Rand) (float64, float64, float64) {
 	return bgR, bgG, bgB
 }
 
-func noiseCircle(dc *gg.Context, rng *rand.Rand, loop int) {
-	for i := 0; i < loop; i++ {
-		// dc.SetRGBA(rng.Float64(), rng.Float64(), rng.Float64(), rng.Float64()*0.3)
-		dc.SetRGBA(
-			rng.Float64()*0.5, // 0.0–0.5
-			rng.Float64()*0.5,
-			rng.Float64()*0.5,
-			0.2+rng.Float64()*0.2, // alpha 0.2–0.4
-		)
-		x := rng.Float64() * float64(width)
-		y := rng.Float64() * float64(height)
-		// size := rng.Float64()*8 + 3
-		size := rng.Float64()*8 + 9
-		dc.DrawCircle(x, y, size)
-		dc.Fill()
-	}
-}
+func drawCharsWithRotation(dc *gg.Context, text string, rng *rand.Rand) {
+	n := len(text)
+	charWidth := float64(width) / float64(n)
 
-func noiseLine(dc *gg.Context, rng *rand.Rand, loop int) {
-	for i := 0; i < loop; i++ {
-		dc.SetRGBA(rng.Float64(), rng.Float64(), rng.Float64(), 0.8)
-		dc.SetLineWidth(float64(rng.Intn(3) + 1))
-		x1 := rng.Float64() * float64(width)
-		y1 := rng.Float64() * float64(height)
-		x2 := rng.Float64() * float64(width)
-		y2 := rng.Float64() * float64(height)
-		dc.DrawLine(x1, y1, x2, y2)
-		dc.Stroke()
-	}
-}
+	for i, ch := range text {
+		dc.Push() // save context
 
-func outputBase64(dc *gg.Context) string {
-	var buf bytes.Buffer
-	png.Encode(&buf, dc.Image())
-	return base64.StdEncoding.EncodeToString(buf.Bytes())
-}
+		x := charWidth*float64(i) + charWidth/2
+		y := float64(height) / 2
 
-func outputPng(dc *gg.Context, filename string) string {
-	file, err := os.Create(filename)
-	if err != nil {
-		panic(err)
+		// random rotation per character
+		angle := float64(rng.Intn(41) - 20) // -20 deg to +20 deg
+		dc.RotateAbout(gg.Radians(angle), x, y)
+
+		// slightly randomize the Y position to make it more natural
+		y += float64(rng.Intn(7) - 3) // -3 px to +3 px
+
+		dc.DrawStringAnchored(string(ch), x, y, 0.5, 0.5)
+
+		dc.Pop() // restore context
 	}
-	defer file.Close()
-	png.Encode(file, dc.Image())
-	return filename
 }
